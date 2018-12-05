@@ -5,6 +5,6 @@ CREATE TABLE `competencia` (
   `nombre` varchar(70) NOT NULL
 );
 
-INSERT INTO `competencia` VALUES
+INSERT INTO `competencia` (`nombre`) VALUES
 ('Que es esto 1?'),
 ('Que es esto 2?');
