@@ -2,7 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var cors = require('cors');
-var controller = require('./controladores/competenciasController');
+var competenciasController = require('./controladores/competenciasController');
 
 var app = express();
 
@@ -14,7 +14,9 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-app.get('/competencias', controller.listAll);
+app.get('/competencias', competenciasController.listAll);
+app.get('/competencias/:id/peliculas', competenciasController.getOptions);
+app.post('/competencias/:id/voto', competenciasController.addVote);
 
 var puerto = '8080';
 
