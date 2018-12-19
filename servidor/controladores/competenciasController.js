@@ -95,6 +95,25 @@ var controller = {
   
       res.send(JSON.stringify(response));
     });
+  },
+
+  newComp: function (req, res) {
+
+    var sql = ``;
+
+    connection.query(sql, [parseInt(req.params.id)], function(error, result) {
+      
+      if (error) {
+        console.log("ERROR: ", error.message);
+        return res.status(404).send(error.message)       
+      }
+
+      var response = {
+        resultados: result
+      }
+  
+      res.send(JSON.stringify(response));
+    });
   }
 }
 

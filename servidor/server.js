@@ -18,6 +18,7 @@ app.get('/competencias', competenciasController.listAll);
 app.get('/competencias/:id/peliculas', competenciasController.getOptions);
 app.post('/competencias/:id/voto', competenciasController.addVote);
 app.get('/competencias/:id/resultados', competenciasController.getResults);
+app.post('/competencias', competenciasController.newComp);
 
 var puerto = '8080';
 
