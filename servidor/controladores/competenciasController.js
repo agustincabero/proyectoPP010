@@ -98,21 +98,21 @@ var controller = {
   },
 
   newComp: function (req, res) {
+    
+    var sql = 'INSERT INTO competencia(nombre) VALUES (?)';
 
-    var sql = ``;
-
-    connection.query(sql, [parseInt(req.params.id)], function(error, result) {
+    connection.query(sql, [req.body.nombre], function(error, result) {
       
       if (error) {
         console.log("ERROR: ", error.message);
         return res.status(404).send(error.message)       
       }
 
-      var response = {
-        resultados: result
-      }
-  
-      res.send(JSON.stringify(response));
+      // var response = {
+      //   resultados: result
+      // }
+      // modificar la respuesta
+      res.send(JSON.stringify(result));
     });
   }
 }
