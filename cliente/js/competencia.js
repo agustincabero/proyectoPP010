@@ -170,6 +170,7 @@ function CompetenciasController () {
 	    });
 	},
 	this.cargarResultados =  function (id, data){
+		console.log(data.resultados);
 		// Se carga el nombre de la competencia en el contenedor del título
 		$("#nombreCompetencia").text(data.competencia);
 		// Se recorren los resultados (data es un array)

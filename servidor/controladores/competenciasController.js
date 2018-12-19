@@ -34,7 +34,7 @@ var controller = {
       }
       
       var competencia = result[0].nombre;
-      var sqlPeliculas = `SELECT pelicula.id, pelicula.poster, pelicula.titulo FROM pelicula LIMIT 2`;
+      var sqlPeliculas = `SELECT pelicula.id, pelicula.poster, pelicula.titulo FROM pelicula ORDER BY rand() LIMIT 2`;
 
       connection.query(sqlPeliculas, function (error, result){
         if (error) {
@@ -61,17 +61,39 @@ var controller = {
     console.log(req.body.idPelicula, req.params.id);
 
     connection.query(sql, [parseInt(req.body.idPelicula), parseInt(req.params.id)], function(error, result) {
-      console.log(result);
-      console.log(error);
-
+      
       if (error) {
         console.log("ERROR: ", error.message);
         return res.status(404).send(error.message)       
       }
-      console.log('assadsad');
-      res.status(200).send();
-      console.log('assadsad');  
 
+      res.status(200).send();
+    });
+  },
+
+  getResults: function (req, res) {
+
+    var sql = `
+    SELECT COUNT(pelicula_id) as votos, pelicula_id, competencia.nombre as competencia, pelicula.poster, pelicula.titulo 
+    FROM votos 
+    JOIN competencia ON votos.competencia_id = competencia.id
+    JOIN pelicula ON votos.pelicula_id = pelicula.id
+    WHERE competencia_id = 1 
+    GROUP BY pelicula_id 
+    ORDER BY votos DESC LIMIT 3`;
+
+    connection.query(sql, [parseInt(req.params.id)], function(error, result) {
+      
+      if (error) {
+        console.log("ERROR: ", error.message);
+        return res.status(404).send(error.message)       
+      }
+
+      var response = {
+        resultados: result
+      }
+  
+      res.send(JSON.stringify(response));
     });
   }
 }
