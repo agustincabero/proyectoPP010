@@ -13,5 +13,5 @@ CREATE TABLE votos (
    pelicula_id int unsigned,
    competencia_id int,
    FOREIGN KEY (pelicula_id) REFERENCES pelicula(id),
-   FOREIGN KEY (competencia_id) REFERENCES competencia(id),
+   FOREIGN KEY (competencia_id) REFERENCES competencia(id)
 );
