@@ -36,7 +36,7 @@ var controller = {
   },
 
   getOptions: function (req, res) {
-    
+
     var idOpt = req.params.id; 
     var sql = `SELECT * FROM competencia WHERE id = ${idOpt}`;
     
@@ -50,10 +50,16 @@ var controller = {
         console.log("No se encontro ninguna competencia con este id");
         return res.status(404).send("No se encontro ninguna competencia con este id");
       }
-      
+      console.log(result[0].genero_id);
       var competencia = result[0].nombre;
-      var sqlPeliculas = `SELECT pelicula.id, pelicula.poster, pelicula.titulo FROM pelicula ORDER BY rand() LIMIT 2`;
+      var sqlPeliculas = `SELECT pelicula.id, pelicula.poster, pelicula.titulo FROM pelicula `;
 
+      if (result[0].genero_id) {
+        sqlPeliculas += `WHERE genero_id = ${result[0].genero_id} `
+      }
+
+      sqlPeliculas += `ORDER BY rand() LIMIT 2`;
+      console.log(sqlPeliculas);
       connection.query(sqlPeliculas, function (error, result){
         if (error) {
           console.log("ERROR: ", error.message);
@@ -131,9 +137,9 @@ var controller = {
         return res.status(422).send('LA COMPETENCIA YA EXISTE')
       }
 
-      var sqlNew = 'INSERT INTO competencia(nombre) VALUES (?)';
+      var sqlNew = 'INSERT INTO competencia(nombre, genero_id) VALUES (?, ?)';
 
-      connection.query(sqlNew, [req.body.nombre], function(error, result) {
+      connection.query(sqlNew, [req.body.nombre, req.body.genero], function(error, result) {
       
         if (error) {
           console.log("ERROR: ", error.message);

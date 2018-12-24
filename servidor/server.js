@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var cors = require('cors');
 var competenciasController = require('./controladores/competenciasController');
+var generosController = require('./controladores/generosController');
 
 var app = express();
 
@@ -21,6 +22,8 @@ app.post('/competencias/:id/voto', competenciasController.addVote);
 app.get('/competencias/:id/resultados', competenciasController.getResults);
 app.post('/competencias', competenciasController.newComp);
 app.delete('/competencias/:id/votos', competenciasController.restart);
+app.get('/generos', generosController.getGenres);
+
 
 var puerto = '8080';
 
