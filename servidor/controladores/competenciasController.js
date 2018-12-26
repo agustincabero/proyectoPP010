@@ -19,7 +19,12 @@ var controller = {
 
   getComp: function (req, res) {
     
-    var sql = 'SELECT * FROM competencia WHERE id = ?';
+    var sql = `
+    SELECT c.nombre as nombre, g.nombre as genero, d.nombre as director, a.nombre as actor FROM competencia c
+    LEFT JOIN genero g ON c.genero_id = g.id
+    LEFT JOIN director d ON c.director_id = d.id
+    LEFT JOIN actor a ON c.actor_id = a.id
+    WHERE c.id = ?`;
 
     connection.query(sql, [req.params.id], function(error, result) {
       if (error) {
@@ -28,7 +33,10 @@ var controller = {
       }
 
       var response = {
-        'nombre': result[0].nombre
+        'nombre': result[0].nombre,
+        'genero_nombre': result[0].genero,
+        'actor_nombre': result[0].actor,
+        'director_nombre': result[0].director
       };
       
       res.send(JSON.stringify(response));
@@ -50,27 +58,51 @@ var controller = {
         console.log("No se encontro ninguna competencia con este id");
         return res.status(404).send("No se encontro ninguna competencia con este id");
       }
-      console.log(result[0].genero_id);
-      var competencia = result[0].nombre;
-      var sqlPeliculas = `SELECT pelicula.id, pelicula.poster, pelicula.titulo FROM pelicula `;
+      
+      var competencia = result[0];
+      var sqlPeliculas = `SELECT p.id, p.titulo, p.poster FROM pelicula p`;
+      var join = ``;
+      var filter = ` WHERE `;
 
-      if (result[0].genero_id) {
-        sqlPeliculas += `WHERE genero_id = ${result[0].genero_id} `
+      if (competencia.genero_id) {
+        filter += `p.genero_id = ${competencia.genero_id}`
+      }
+      
+      if (competencia.director_id) {
+        if (competencia.genero_id) {
+          filter += ` AND `
+        }
+        join += ` INNER JOIN director_pelicula d ON p.id = d.pelicula_id`
+        filter += `d.director_id = ${competencia.director_id}`
       }
 
-      sqlPeliculas += `ORDER BY rand() LIMIT 2`;
-      console.log(sqlPeliculas);
+      if (competencia.actor_id) {
+        if (competencia.genero_id || competencia.director_id) {
+          filter += ` AND `
+        }
+        join += ` INNER JOIN actor_pelicula a ON p.id = a.pelicula_id`
+        filter += `a.actor_id = ${competencia.actor_id}`
+      }
+
+      if (join != ``) {
+        sqlPeliculas += join;
+      }
+
+      if (filter != ` WHERE `) {
+        sqlPeliculas += filter;
+      }
+
+      sqlPeliculas += ` ORDER BY rand() LIMIT 2`;
+
       connection.query(sqlPeliculas, function (error, result){
         if (error) {
           console.log("ERROR: ", error.message);
           return res.status(404).send(error.message)       
         }
-
-        var peliculas = result;
         
         var response = {
-          'competencia': competencia,
-          'peliculas': peliculas
+          'competencia': competencia.nombre,
+          'peliculas': result
         };
     
         res.send(JSON.stringify(response));
@@ -137,9 +169,31 @@ var controller = {
         return res.status(422).send('LA COMPETENCIA YA EXISTE')
       }
 
-      var sqlNew = 'INSERT INTO competencia(nombre, genero_id) VALUES (?, ?)';
+      var columns = 'nombre';
+      var valColumns = '?';
+      var arrColumns = [req.body.nombre];
 
-      connection.query(sqlNew, [req.body.nombre, req.body.genero], function(error, result) {
+      if (req.body.genero && req.body.genero != 0) {
+        columns += ', genero_id';
+        valColumns += ', ?';
+        arrColumns.push(req.body.genero)
+      }
+
+      if (req.body.director && req.body.director != 0) {
+        columns += ', director_id';
+        valColumns += ', ?';
+        arrColumns.push(req.body.director)
+      }
+
+      if (req.body.actor && req.body.actor != 0) {
+        columns += ', actor_id';
+        valColumns += ', ?';
+        arrColumns.push(req.body.actor)
+      }
+
+      var sqlNew = `INSERT INTO competencia(${columns}) VALUES (${valColumns})`;
+      
+      connection.query(sqlNew, arrColumns, function(error, result) {
       
         if (error) {
           console.log("ERROR: ", error.message);
@@ -163,8 +217,8 @@ var controller = {
       }
 
       if (result.length == 0) {
-        console.log("ERROR: ", 'Competencia inexistente');
-        return res.status(404).send('LA COMPETENCIA NO EXISTE')
+        console.log("ERROR: ", 'Competencia inexistente o sin votos');
+        return res.status(404).send('LA COMPETENCIA AUN NO TIENE VOTOS')
       }
 
       var sqlDelete = 'DELETE FROM votos WHERE competencia_id = ?';

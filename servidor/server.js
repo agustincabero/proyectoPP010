@@ -4,6 +4,8 @@ var morgan = require('morgan');
 var cors = require('cors');
 var competenciasController = require('./controladores/competenciasController');
 var generosController = require('./controladores/generosController');
+var directoresController = require('./controladores/directoresController');
+var actoresController = require('./controladores/actoresController');
 
 var app = express();
 
@@ -23,6 +25,8 @@ app.get('/competencias/:id/resultados', competenciasController.getResults);
 app.post('/competencias', competenciasController.newComp);
 app.delete('/competencias/:id/votos', competenciasController.restart);
 app.get('/generos', generosController.getGenres);
+app.get('/directores', directoresController.getDirectors);
+app.get('/actores', actoresController.getActors);
 
 
 var puerto = '8080';
