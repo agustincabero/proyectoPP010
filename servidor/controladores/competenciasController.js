@@ -233,8 +233,47 @@ var controller = {
         res.status(200).send();
       });
     });
-  }
+  },
 
+  editComp: function (req, res) {
+    
+    var sql = 'UPDATE competencia SET nombre = ? WHERE id = ?';
+    
+    connection.query(sql, [req.body.nombre, req.params.id], function(error, result) {
+      
+      if (error) {
+        console.log("ERROR: ", error.message);
+        return res.status(404).send(error.message)       
+      }
+      
+      res.status(200).send();   
+    });
+  },
+
+  deleteComp: function (req, res) {
+    
+    var sql = 'DELETE FROM votos WHERE competencia_id = ?';
+
+    connection.query(sql, [req.params.id], function(error, result) {
+      
+      if (error) {
+        console.log("ERROR: ", error.message);
+        return res.status(404).send(error.message)       
+      }
+
+      var sqlDelete = 'DELETE FROM competencia WHERE id = ?';
+
+      connection.query(sqlDelete, [req.params.id], function(error, result) {
+      
+        if (error) {
+          console.log("ERROR: ", error.message);
+          return res.status(404).send(error.message)       
+        }
+
+        res.status(200).send();
+      });      
+    });
+  }
 }
 
 module.exports = controller

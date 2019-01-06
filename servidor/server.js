@@ -27,6 +27,8 @@ app.delete('/competencias/:id/votos', competenciasController.restart);
 app.get('/generos', generosController.getGenres);
 app.get('/directores', directoresController.getDirectors);
 app.get('/actores', actoresController.getActors);
+app.delete('/competencias/:id', competenciasController.deleteComp);
+app.put('/competencias/:id', competenciasController.editComp);
 
 
 var puerto = '8080';
